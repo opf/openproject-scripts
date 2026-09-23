@@ -1,0 +1,68 @@
+<% html_title t(:label_administration), t("scripts.plural") %>
+
+<%=
+  render(Primer::OpenProject::PageHeader.new) do |header|
+    header.with_title { t("scripts.plural") }
+    header.with_breadcrumbs(
+      [{ href: admin_index_path, text: t("label_administration") },
+       { href: admin_settings_api_path, text: t("menus.admin.api_and_webhooks") },
+       t("scripts.plural")]
+    )
+  end
+%>
+
+<%=
+  render(Primer::OpenProject::SubHeader.new) do |subheader|
+    subheader.with_action_button(
+      scheme: :primary,
+      leading_icon: :plus,
+      label: I18n.t("scripts.label_add_new"),
+      tag: :a,
+      href: new_admin_script_path
+    ) do
+      t("scripts.singular")
+    end
+  end
+%>
+
+<%= render EnterpriseEdition::BannerComponent.new(:running_scripts, variant: :inline) %>
+
+<div class="generic-table--container">
+  <div class="generic-table--results-container">
+    <table class="generic-table">
+      <thead>
+        <tr>
+          <th><%= Scripts::Script.human_attribute_name(:name) %></th>
+          <th><%= Scripts::Script.human_attribute_name(:enabled) %></th>
+          <th><%= Scripts::Script.human_attribute_name(:run_as) %></th>
+          <th><%= Scripts::Script.human_attribute_name(:events) %></th>
+          <th><div class="generic-table--empty-header"></div></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if @scripts.any? %>
+          <% @scripts.each do |script| %>
+            <tr>
+              <td><%= link_to script.name, admin_script_path(script) %></td>
+              <td><%= script.enabled? ? t(:general_text_yes) : t(:general_text_no) %></td>
+              <td><%= t("scripts.form.run_as.#{script.run_as}") %></td>
+              <td><%= t("scripts.label_x_events", count: script.event_names.size) %></td>
+              <td class="buttons">
+                <%= link_to "", edit_admin_script_path(script), class: "icon icon-edit", title: t(:button_edit) %>
+                <%= link_to "",
+                            admin_script_path(script),
+                            data: { turbo_method: :delete, turbo_confirm: t(:text_are_you_sure) },
+                            class: "icon icon-delete",
+                            title: t(:button_delete) %>
+              </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="5"><%= t("scripts.no_results_table") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

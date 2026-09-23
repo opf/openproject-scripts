@@ -1,0 +1,5 @@
+# Inherits OpenProject core's rubocop config. Assumes this plugin checkout
+# sits as a sibling of the openproject/ core checkout, matching the layout
+# from docs/development/create-openproject-plugin.
+inherit_from:
+  - ../../openproject/.rubocop.yml

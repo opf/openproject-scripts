@@ -1,0 +1,49 @@
+<% html_title t(:label_administration), t("scripts.plural"), @script.name %>
+
+<%=
+  render(Primer::OpenProject::PageHeader.new) do |header|
+    header.with_title { @script.name }
+    header.with_breadcrumbs(
+      [{ href: admin_index_path, text: t("label_administration") },
+       { href: admin_settings_api_path, text: t("menus.admin.api_and_webhooks") },
+       { href: admin_scripts_path, text: t("scripts.plural") },
+       @script.name]
+    )
+  end
+%>
+
+<%= render EnterpriseEdition::BannerComponent.new(:running_scripts, variant: :inline) %>
+
+<div class="account--section">
+  <%= render(AttributeGroups::AttributeGroupComponent.new) do |component|
+        component.with_attribute(
+          key: Scripts::Script.human_attribute_name("description"),
+          value: @script.description
+        )
+        component.with_attribute(
+          key: Scripts::Script.human_attribute_name("enabled"),
+          value: @script.enabled? ? t(:general_text_yes) : t(:general_text_no)
+        )
+        component.with_attribute(
+          key: Scripts::Script.human_attribute_name("run_as"),
+          value: t("scripts.form.run_as.#{@script.run_as}")
+        )
+        component.with_attribute(
+          key: Scripts::Script.human_attribute_name("events"),
+          value: @script.event_names.join(", ")
+        )
+        component.with_attribute(
+          key: Scripts::Script.human_attribute_name("projects"),
+          value: if @script.all_projects?
+                   t(:label_all)
+                 else
+                   @script.projects.map(&:name).join(", ")
+                 end
+        )
+      end %>
+</div>
+
+<div class="account--section">
+  <h2><%= Scripts::Script.human_attribute_name("text") %></h2>
+  <pre><code><%= @script.text %></code></pre>
+</div>

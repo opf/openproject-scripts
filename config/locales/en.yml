@@ -1,0 +1,67 @@
+---
+en:
+  activerecord:
+    attributes:
+      scripts/script:
+        description: 'Description'
+        enabled: 'Enabled'
+        events: 'Events'
+        name: 'Name'
+        project_ids: 'Enabled projects'
+        projects: 'Enabled projects'
+        run_as: 'Run script as'
+        text: 'Script'
+    errors:
+      models:
+        scripts/script:
+          attributes:
+            text:
+              invalid_syntax: "is not valid Ruby syntax."
+    models:
+      scripts/script:
+        one: "Script"
+        other: "Scripts"
+  plugin_openproject_scripts:
+    description: "Provides an admin feature to run custom Ruby code in response to domain events."
+    name: "OpenProject Scripts"
+  scripts:
+    events:
+      comment: "Comment"
+      created: "Created"
+      internal_comment: "Internal comment"
+      updated: "Updated"
+    form:
+      enabled:
+        description: >
+          When checked, the script will run on the selected events. Uncheck to disable the script.
+      events:
+        title: 'Enabled events'
+      introduction: >
+        This script will run as Ruby code whenever one of the selected events occurs. Use with caution: scripts run
+        with full application privileges.
+      project_ids:
+        all: 'All projects'
+        description: 'Select for which projects this script should run.'
+        selected: 'Selected projects only'
+        title: 'Enabled projects'
+      run_as:
+        current_user: 'Current user (the user who triggered the event, where available)'
+        system_user: 'System user'
+        title: 'Run script as'
+      selected_project_ids:
+        title: 'Selected projects'
+      text:
+        description: >
+          Your code runs inside a Proc, not a method - a bare `return` statement will raise an error.
+    label_add_new: Add new script
+    label_edit: Edit script
+    label_x_events:
+      one: "1 event"
+      other: "%{count} events"
+      zero: "No events"
+    no_results_table: No scripts have been defined yet.
+    plural: Scripts
+    resources:
+      time_entry:
+        name: "Time entry"
+    singular: Script
