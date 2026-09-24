@@ -1,21 +1,35 @@
-# OpenProject Scripts
+# OpenProject Scripts (Experimental)
 
-Lets an instance administrator write custom Ruby code and register it to run automatically when
-certain domain events occur — work packages or projects created/updated, work package comments
-added, time entries or attachments created. When a matching event fires, the script executes
-asynchronously inside a `Proc`, receiving the event name, the acting user, and the live domain
-object(s) involved (the work package, project, journal, etc.).
+> ⚠️ **Experimental code — do not install on any critical or production infrastructure.**
+> This plugin lets an admin execute arbitrary Ruby with full application privileges. It has not
+> been hardened, audited, or reviewed for production use, and it is not intended to be.
+
+## Purpose
+
+This plugin is an experiment, not a product. Its goal is to get a feel for what *radical
+extensibility* in OpenProject could be like — inspired by Jira's ScriptRunner — by giving an
+instance admin the ability to write custom Ruby and have it run automatically on domain events
+(work packages or projects created/updated, comments added, time entries or attachments created).
+
+The point is to **trigger new ideas** about what extensibility in OpenProject might look like, not
+to arrive at a finished feature. Nothing here should be read as a proposal to ship "exactly this."
+If it sparks a direction worth pursuing, that direction will very likely look different from this
+experiment once real design, security, and product considerations are applied.
+
+## What it does
+
+An admin writes Ruby code, saves it as a `Scripts::Script`, and subscribes it to one or more of the
+same events OpenProject's built-in Webhooks feature already fires on. When a matching event occurs,
+the script runs asynchronously inside a `Proc`, receiving the event name, the acting user, and the
+live domain object(s) involved (the work package, project, journal, etc.).
+
+It sits behind two independent gates — a `running_scripts` feature flag (off by default outside
+development) and an Enterprise-token check — as a minimum safety net, not as a substitute for
+treating this as untrusted, unreviewed code.
 
 This is deliberately modeled on OpenProject's built-in Webhooks feature — same event catalog,
 same admin menu placement (a sibling of Webhooks under *Administration → API and webhooks*), same
 async delivery via a background job.
-
-Because it grants an admin the ability to run arbitrary Ruby with full application privileges,
-this plugin is gated behind two independent switches, both of which must be satisfied:
-
-- the `running_scripts` feature flag (off by default in production/test, on by default in
-  development), toggleable at *Administration → Settings → Experimental*, and
-- an Enterprise token that grants the `running_scripts` feature.
 
 See `docs/development/create-openproject-plugin` in OpenProject core for the general plugin
 mechanism this follows.
