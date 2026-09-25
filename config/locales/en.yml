@@ -16,7 +16,7 @@ en:
         scripts/script:
           attributes:
             text:
-              invalid_syntax: "is not valid Ruby syntax."
+              invalid_syntax: "has invalid Ruby syntax: %{detail}"
     models:
       scripts/script:
         one: "Script"

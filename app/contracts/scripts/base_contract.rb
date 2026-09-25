@@ -28,8 +28,6 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require "ripper"
-
 module Scripts
   class BaseContract < ::ModelContract
     include RequiresAdminGuard
@@ -64,11 +62,24 @@ module Scripts
       # Parsed as a standalone snippet, control-flow keywords the script is
       # expected to use for an early exit (`next`, since a bare `return`
       # raises LocalJumpError inside a Proc) are themselves a parse error --
-      # they are only valid inside a block. Wrap in one so Ripper sees the
-      # same context the text actually runs in once embedded in the
+      # they are only valid inside a block. Wrap in one so the parser sees
+      # the same context the text actually runs in once embedded in the
       # Proc.new { |...| } built by Scripts::ExecutionJob.
       wrapped = "Proc.new { |**_kwargs|\n#{text}\n}"
-      errors.add(:text, :invalid_syntax) if Ripper.sexp(wrapped).nil?
+      RubyVM::AbstractSyntaxTree.parse(wrapped)
+    rescue SyntaxError => e
+      errors.add(:text, :invalid_syntax, detail: format_syntax_error(e))
+    end
+
+    # Rewrite the parser's error to reference the user's script line numbers
+    # rather than the wrapped source's. Our wrapper prepends one line, so
+    # wrapped line N corresponds to user line N-1 for N >= 2.
+    def format_syntax_error(error)
+      error.message
+           .lines
+           .map { |line| line.sub(/\A[^:]+:(\d+):/) { "line #{[Regexp.last_match(1).to_i - 1, 1].max}:" } }
+           .join
+           .strip
     end
   end
 end

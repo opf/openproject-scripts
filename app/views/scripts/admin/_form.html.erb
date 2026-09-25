@@ -14,7 +14,12 @@
   </div>
 
   <div class="form--field -required">
-    <%= f.text_area :text, rows: 25, container_class: "-wide", required: true %>
+    <%= f.text_area :text,
+                    rows: 25,
+                    container_class: "-wide",
+                    required: true,
+                    style: "font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; " \
+                           "font-size: 13px; width: 100%; max-width: none;" %>
     <div class="form--field-instructions">
       <%= t("scripts.form.text.description") %>
     </div>
