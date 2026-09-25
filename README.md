@@ -8,10 +8,11 @@
 
 This plugin is an experiment, not a product. Its goal is to get a feel for what *radical
 extensibility* in OpenProject could be like — inspired by Jira's ScriptRunner — by giving an
-instance admin the ability to write custom Ruby and have it run automatically on domain events
-(work packages or projects created/updated, comments added, time entries or attachments created).
+instance admin the ability to write custom Ruby and have it run automatically on specific events,
+sucha as work packages or projects created/updated, comments added, time entries or attachments 
+created.
 
-The point is to **trigger new ideas** about what extensibility in OpenProject might look like, not
+The point of this experiment is to **trigger new ideas** about what extensibility in OpenProject might look like, not
 to arrive at a finished feature. Nothing here should be read as a proposal to ship "exactly this."
 If it sparks a direction worth pursuing, that direction will very likely look different from this
 experiment once real design, security, and product considerations are applied.
@@ -20,12 +21,14 @@ experiment once real design, security, and product considerations are applied.
 
 An admin writes Ruby code, saves it as a script, and subscribes it to one or more of the
 same events OpenProject's built-in Webhooks feature already fires on. When a matching event occurs,
-the script runs asynchronously inside a `Proc`, receiving the event name, the acting user, and the
+the script runs inside a `Proc`, receiving the event name, the acting user, and the
 live domain object(s) involved (the work package, project, journal, etc.).
 
-It sits behind two independent gates — a `running_scripts` feature flag (off by default outside
-development) and an Enterprise-token check — as a minimum safety net, not as a substitute for
-treating this as untrusted, unreviewed code.
+On work package creation or updates the script can either run asynchronously in the background, not intercepting the user's request.
+Or it can intercept the user's request to exexute right after a work package was created or updated.
+
+This plugin requires an Enterprise token as this is clearly an enterprise feature, if ever developed
+for production.
 
 This is deliberately modeled on OpenProject's built-in Webhooks feature — same event catalog,
 same admin menu placement (a sibling of Webhooks under *Administration → API and webhooks*), same
@@ -36,7 +39,7 @@ mechanism this follows.
 
 ## Requirements
 
-- OpenProject >= 17.0.0
+- OpenProject >= 17.9.0
 - An Enterprise token granting the `running_scripts` feature, to actually create/edit/enable
   scripts through the admin UI (the admin menu item, and read-only access to existing scripts,
   remain visible without one — an upsell banner is shown instead).
@@ -61,7 +64,7 @@ For packaged (deb/rpm) installations, see the
 
 ## Reaching the Scripts admin page
 
-Once the plugin is installed and the `running_scripts` feature flag is enabled, sign in as
+Once the plugin is installed and a correct Enterprise token is provided, sign in as
 an instance administrator and open the admin area:
 
 1. Click your avatar in the top-right corner and choose **Administration**
@@ -70,8 +73,7 @@ an instance administrator and open the admin area:
 3. Select **Scripts**.
 
 From there you can create, edit, enable, and disable scripts, and pick which events they
-subscribe to. The menu item is only shown to admins while the `running_scripts` feature flag
-is active; without a valid Enterprise token the page is read-only and displays an upsell banner
+subscribe to. The menu item is only shown to admins; without a valid Enterprise token the page is read-only and displays an upsell banner
 instead of the create/edit actions.
 
 ## Uninstallation

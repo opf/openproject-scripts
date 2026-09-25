@@ -74,7 +74,6 @@ module OpenProject::Scripts::ServiceCallbacks
   # produces via the aggregated notification.
   def dispatch_after_service(action, service, result)
     return unless result.is_a?(::ServiceResult) && result.success?
-    return unless OpenProject::FeatureDecisions.running_scripts_active?
     return unless EnterpriseToken.allows_to?(:running_scripts)
 
     work_package = result.result

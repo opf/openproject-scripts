@@ -38,7 +38,6 @@ module Scripts
       super(script_id, event_name)
 
       return log_skip("script not found") if script.nil?
-      return log_skip("running_scripts feature flag is off") unless OpenProject::FeatureDecisions.running_scripts_active?
       return log_skip("no Enterprise token allows :running_scripts") unless EnterpriseToken.allows_to?(:running_scripts)
       return log_skip("script is disabled") unless script.enabled?
       return log_skip("script not enabled for this project") unless accepted_in_project?

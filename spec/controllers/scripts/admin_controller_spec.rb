@@ -55,18 +55,6 @@ RSpec.describe Scripts::AdminController do
     end
   end
 
-  describe "the running_scripts feature flag" do
-    it "does not by itself gate controller access (only the admin menu item)" do
-      expect(OpenProject::FeatureDecisions.running_scripts_active?).to be false
-
-      allow(EnterpriseToken).to receive(:allows_to?).and_call_original
-      allow(EnterpriseToken).to receive(:allows_to?).with(:running_scripts).and_return(true)
-      get :index
-
-      expect(response).to be_successful
-    end
-  end
-
   context "without a valid enterprise token for :running_scripts" do
     before do
       allow(EnterpriseToken).to receive(:allows_to?).and_call_original

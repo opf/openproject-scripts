@@ -44,17 +44,10 @@ module OpenProject::Scripts
       menu :admin_menu,
            :plugin_scripts,
            { controller: "/scripts/admin", action: :index },
-           if: Proc.new { User.current.admin? && OpenProject::FeatureDecisions.running_scripts_active? },
+           if: Proc.new { User.current.admin? },
            parent: :api_and_webhooks,
            enterprise_feature: "running_scripts",
            caption: :"scripts.plural"
-    end
-
-    initializer "openproject_scripts.feature_decisions" do
-      OpenProject::FeatureDecisions.add :running_scripts,
-                                        description: "Enables the Scripts admin feature for running custom Ruby " \
-                                                     "code in response to domain events.",
-                                        allow_enabling: true
     end
 
     initializer "openproject_scripts.subscribe_to_notifications" do |app|
