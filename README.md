@@ -18,7 +18,7 @@ experiment once real design, security, and product considerations are applied.
 
 ## What it does
 
-An admin writes Ruby code, saves it as a `Scripts::Script`, and subscribes it to one or more of the
+An admin writes Ruby code, saves it as a script, and subscribes it to one or more of the
 same events OpenProject's built-in Webhooks feature already fires on. When a matching event occurs,
 the script runs asynchronously inside a `Proc`, receiving the event name, the acting user, and the
 live domain object(s) involved (the work package, project, journal, etc.).
@@ -59,6 +59,21 @@ For Docker-based installations, see the
 For packaged (deb/rpm) installations, see the
 [packaged plugin installation guide](https://www.openproject.org/docs/installation-and-operations/configuration/plugins/#adding-plugins-debrpm-packages).
 
+## Reaching the Scripts admin page
+
+Once the plugin is installed and the `running_scripts` feature flag is enabled, sign in as
+an instance administrator and open the admin area:
+
+1. Click your avatar in the top-right corner and choose **Administration**
+   (or go directly to `/admin`).
+2. In the left-hand admin menu, expand **API and webhooks**.
+3. Select **Scripts**.
+
+From there you can create, edit, enable, and disable scripts, and pick which events they
+subscribe to. The menu item is only shown to admins while the `running_scripts` feature flag
+is active; without a valid Enterprise token the page is read-only and displays an upsell banner
+instead of the create/edit actions.
+
 ## Uninstallation
 
 Remove the `gem "openproject-scripts", ...` line from `Gemfile.plugins` and run `bundle install`
@@ -67,7 +82,8 @@ if you want them removed too.
 
 ## Bug reports and contributions
 
-Please report issues and open pull requests against this plugin's repository.
+Please raise issues, questions, and feedback on the
+[OpenProject Community](https://community.openproject.org).
 
 ## License
 
