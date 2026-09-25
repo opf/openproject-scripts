@@ -55,7 +55,10 @@ module OpenProject::Scripts::EventResources
 
         action = journal.internal? ? "internal_comment" : "comment"
         event_name = prefixed_event_name(action)
-        active_scripts.with_event_name(event_name).pluck(:id).each do |id|
+        # See work_package.rb: immediate comment scripts fire via
+        # OpenProject::Scripts::ServiceCallbacks, so only delayed_async are
+        # dispatched here.
+        active_scripts.where(execution_mode: "delayed_async").with_event_name(event_name).pluck(:id).each do |id|
           Scripts::WorkPackageCommentScriptJob.perform_later(id, journal, event_name)
         end
       end

@@ -62,5 +62,15 @@ module OpenProject::Scripts
         ::OpenProject::Scripts::EventResources.subscribe!
       end
     end
+
+    initializer "openproject_scripts.install_service_callbacks" do |app|
+      require "open_project/scripts/service_callbacks"
+      # to_prepare fires on every dev-mode class reload, so the set_callback
+      # registrations survive the reload that would otherwise wipe them off
+      # WorkPackages::{Create,Update}Service.
+      app.config.to_prepare do
+        ::OpenProject::Scripts::ServiceCallbacks.install!
+      end
+    end
   end
 end

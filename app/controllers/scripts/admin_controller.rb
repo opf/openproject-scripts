@@ -33,16 +33,14 @@ module Scripts
     layout "admin"
 
     before_action :require_admin
-    guard_enterprise_feature(:running_scripts, except: %i[index show destroy])
-    before_action :find_script, only: %i[show edit update destroy]
+    guard_enterprise_feature(:running_scripts, except: %i[index destroy])
+    before_action :find_script, only: %i[edit update destroy]
 
     menu_item :plugin_scripts
 
     def index
       @scripts = Scripts::Script.all
     end
-
-    def show; end
 
     def new
       @script = Scripts::Script.new_default
@@ -54,7 +52,7 @@ module Scripts
       call = Scripts::CreateService.new(user: current_user).call(permitted_script_params)
       if call.success?
         flash[:notice] = I18n.t(:notice_successful_create)
-        redirect_to action: :index
+        redirect_to action: :index, status: :see_other
       else
         @script = call.result
         render action: :new, status: :unprocessable_entity
@@ -65,7 +63,7 @@ module Scripts
       call = Scripts::UpdateService.new(user: current_user, model: @script).call(permitted_script_params)
       if call.success?
         flash[:notice] = I18n.t(:notice_successful_update)
-        redirect_to action: :index
+        redirect_to action: :index, status: :see_other
       else
         @script = call.result
         render action: :edit, status: :unprocessable_entity
@@ -93,8 +91,11 @@ module Scripts
     end
 
     def permitted_script_params
-      params.expect(script: [:name, :description, :text, :enabled, :run_as, :lock_version,
-                             :project_ids, { selected_project_ids: [], events: [] }])
+      # `scripts_script` is what Primer form_with produces for the namespaced
+      # Scripts::Script model. The classic ERB form used `as: "script"` to
+      # override this to `script`, but the Primer DSL ignores `as:`.
+      params.expect(scripts_script: [:name, :description, :text, :enabled, :run_as, :execution_mode, :lock_version,
+                                     :project_ids, { selected_project_ids: [], events: [] }])
     end
   end
 end

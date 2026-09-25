@@ -28,12 +28,8 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require "timeout"
-
 module Scripts
   class ExecutionJob < Scripts::ScriptJob
-    SCRIPT_TIMEOUT_SECONDS = 10
-
     attr_reader :resource, :actor
 
     def perform(script_id, resource, event_name, actor: nil)
@@ -47,7 +43,7 @@ module Scripts
       return log_skip("script is disabled") unless script.enabled?
       return log_skip("script not enabled for this project") unless accepted_in_project?
 
-      execute_script
+      Scripts::Runner.new(script:, event_name:, context: execution_context, actor:).call
     end
 
     def accepted_in_project?
@@ -67,51 +63,6 @@ module Scripts
     end
 
     private
-
-    def execute_script
-      payload = script_payload
-      Timeout.timeout(SCRIPT_TIMEOUT_SECONDS) do
-        script_proc(payload.keys).call(**payload)
-      end
-    rescue StandardError => e
-      log_failure(e)
-    end
-
-    def script_payload
-      { event: event_name, current_user: resolve_current_user }.merge(execution_context)
-    end
-
-    def resolve_current_user
-      if script.run_as == "current_user" && actor
-        actor
-      else
-        User.system
-      end
-    end
-
-    # Builds `Proc.new { |event:, current_user:, work_package:, ...| <script.text> }`,
-    # binding every payload key as a real local variable the script body can
-    # reference directly (e.g. `work_package.id`), rather than hiding them
-    # behind a **context hash. The interpolated body is arbitrary
-    # admin-authored Ruby, so no comment block can document its literal
-    # appearance the way this cop expects.
-    def script_proc(payload_keys)
-      isolated_binding = Object.new.instance_eval { binding }
-      params = payload_keys.map { |key| "#{key}:" }.join(", ")
-      eval( # rubocop:disable Security/Eval, Style/DocumentDynamicEvalDefinition
-        "Proc.new { |#{params}| \n#{script.text}\n }",
-        isolated_binding,
-        __FILE__,
-        __LINE__ - 3
-      )
-    end
-
-    def log_failure(error)
-      Rails.logger.error do
-        "[Scripts] Script ##{script.id} (#{script.name}) failed on #{event_name}: " \
-          "#{error.class}: #{error.message}\n#{error.backtrace&.join("\n")}"
-      end
-    end
 
     def log_skip(reason)
       Rails.logger.info { "[Scripts] Skipping script ##{script_id} for #{event_name}: #{reason}" }

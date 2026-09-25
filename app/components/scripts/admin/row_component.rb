@@ -28,36 +28,36 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require_relative "base"
+module Scripts
+  module Admin
+    class RowComponent < ApplicationComponent
+      include ApplicationHelper
+      include OpPrimer::ComponentHelpers
+      include OpTurbo::Streamable
 
-module OpenProject::Scripts::EventResources
-  class TimeEntry < Base
-    class << self
-      def notification_names
-        [
-          OpenProject::Events::TIME_ENTRY_CREATED
-        ]
+      def initialize(script:)
+        @script = script
+        super
       end
 
-      def available_actions
-        %i(created)
+      def enabled_label
+        @script.enabled? ? I18n.t(:general_text_yes) : I18n.t(:general_text_no)
       end
 
-      def resource_name
-        I18n.t "scripts.resources.time_entry.name"
+      def enabled_scheme
+        @script.enabled? ? :success : :secondary
       end
 
-      protected
+      def run_as_label
+        I18n.t("scripts.form.run_as.#{@script.run_as}")
+      end
 
-      def handle_notification(payload, _event_name)
-        event_name = prefixed_event_name(:created)
-        time_entry = payload[:time_entry]
+      def execution_mode_label
+        I18n.t("scripts.form.execution_mode.#{@script.execution_mode}.label")
+      end
 
-        active_scripts.with_event_name(event_name).find_each do |script|
-          dispatch_script(script, time_entry, event_name,
-                          context: { time_entry: },
-                          job_class: Scripts::TimeEntryScriptJob)
-        end
+      def events_summary
+        I18n.t("scripts.label_x_events", count: @script.event_names.size)
       end
     end
   end

@@ -27,42 +27,17 @@
 
 <%= render EnterpriseEdition::BannerComponent.new(:running_scripts, variant: :inline) %>
 
-<div class="generic-table--container">
-  <div class="generic-table--results-container">
-    <table class="generic-table">
-      <thead>
-        <tr>
-          <th><%= Scripts::Script.human_attribute_name(:name) %></th>
-          <th><%= Scripts::Script.human_attribute_name(:enabled) %></th>
-          <th><%= Scripts::Script.human_attribute_name(:run_as) %></th>
-          <th><%= Scripts::Script.human_attribute_name(:events) %></th>
-          <th><div class="generic-table--empty-header"></div></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% if @scripts.any? %>
-          <% @scripts.each do |script| %>
-            <tr>
-              <td><%= link_to script.name, admin_script_path(script) %></td>
-              <td><%= script.enabled? ? t(:general_text_yes) : t(:general_text_no) %></td>
-              <td><%= t("scripts.form.run_as.#{script.run_as}") %></td>
-              <td><%= t("scripts.label_x_events", count: script.event_names.size) %></td>
-              <td class="buttons">
-                <%= link_to "", edit_admin_script_path(script), class: "icon icon-edit", title: t(:button_edit) %>
-                <%= link_to "",
-                            admin_script_path(script),
-                            data: { turbo_method: :delete, turbo_confirm: t(:text_are_you_sure) },
-                            class: "icon icon-delete",
-                            title: t(:button_delete) %>
-              </td>
-            </tr>
-          <% end %>
-        <% else %>
-          <tr>
-            <td colspan="5"><%= t("scripts.no_results_table") %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
-</div>
+<%=
+  render(OpenProject::Common::BorderBoxListComponent.new(container: "op-admin-scripts--list", mb: 4)) do |list|
+    list.with_header(title: t("scripts.plural"))
+
+    @scripts.each do |script|
+      list.with_item { render(Scripts::Admin::RowComponent.new(script: script)) }
+    end
+
+    list.with_empty_state(
+      title: t("scripts.no_results_table"),
+      test_selector: "op-admin-scripts--placeholder"
+    )
+  end
+%>

@@ -28,37 +28,8 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require_relative "base"
-
-module OpenProject::Scripts::EventResources
-  class TimeEntry < Base
-    class << self
-      def notification_names
-        [
-          OpenProject::Events::TIME_ENTRY_CREATED
-        ]
-      end
-
-      def available_actions
-        %i(created)
-      end
-
-      def resource_name
-        I18n.t "scripts.resources.time_entry.name"
-      end
-
-      protected
-
-      def handle_notification(payload, _event_name)
-        event_name = prefixed_event_name(:created)
-        time_entry = payload[:time_entry]
-
-        active_scripts.with_event_name(event_name).find_each do |script|
-          dispatch_script(script, time_entry, event_name,
-                          context: { time_entry: },
-                          job_class: Scripts::TimeEntryScriptJob)
-        end
-      end
-    end
+class AddExecutionModeToScripts < ActiveRecord::Migration[8.1]
+  def change
+    add_column :scripts_scripts, :execution_mode, :string, null: false, default: "delayed_async"
   end
 end

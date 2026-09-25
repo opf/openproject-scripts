@@ -12,15 +12,4 @@
   end
 %>
 
-<%= error_messages_for @script %>
-
-<%= labelled_tabular_form_for @script,
-                              url: { action: :create },
-                              as: "script",
-                              html: { class: "form", autocomplete: "off" } do |f| %>
-  <%= render partial: "form", locals: { f: f, script: @script } %>
-  <p>
-    <%= styled_button_tag t(:button_create), class: "-primary -with-icon icon-checkmark" %>
-    <%= link_to t(:button_cancel), { action: :index }, class: "button -with-icon icon-cancel" %>
-  </p>
-<% end %>
+<%= render partial: "form", locals: { url: admin_scripts_path, method: :post } %>

@@ -1,0 +1,37 @@
+<%=
+  component_wrapper(data: { "test-selector": "op-admin-scripts--row" }) do
+    flex_layout(align_items: :center, justify_content: :space_between) do |row|
+      row.with_column(flex_layout: true, flex: 1) do |info|
+        info.with_column(mr: 2) do
+          render(Primer::Beta::Link.new(href: edit_admin_script_path(@script), font_weight: :bold)) do
+            @script.name
+          end
+        end
+
+        info.with_column(mr: 2) do
+          render(Primer::Beta::Label.new(scheme: enabled_scheme)) { enabled_label }
+        end
+
+        info.with_column(mr: 2) do
+          render(Primer::Beta::Text.new(font_size: :small, color: :subtle)) do
+            "#{execution_mode_label} · #{run_as_label} · #{events_summary}"
+          end
+        end
+      end
+
+      row.with_column do
+        render(Primer::Beta::IconButton.new(
+                 icon: :trash,
+                 scheme: :danger,
+                 "aria-label": I18n.t(:button_delete),
+                 tag: :a,
+                 href: admin_script_path(@script),
+                 data: {
+                   turbo_method: :delete,
+                   turbo_confirm: I18n.t(:text_are_you_sure)
+                 }
+               ))
+      end
+    end
+  end
+%>

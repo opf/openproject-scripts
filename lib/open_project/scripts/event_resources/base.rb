@@ -98,6 +98,22 @@ module OpenProject::Scripts::EventResources
       def active_scripts
         ::Scripts::Script.enabled
       end
+
+      ##
+      # Route one script to the right execution path: immediate scripts run
+      # inline in this thread via Scripts::Runner, delayed_async scripts get
+      # enqueued on the given job class. Both share the same guardrails once
+      # they enter execution.
+      def dispatch_script(script, resource, event_name, context:, job_class:, actor: nil)
+        if script.immediate?
+          return unless OpenProject::FeatureDecisions.running_scripts_active?
+          return unless EnterpriseToken.allows_to?(:running_scripts)
+
+          ::Scripts::Runner.new(script:, event_name:, context:, actor:).call
+        else
+          job_class.perform_later(script.id, resource, event_name, actor:)
+        end
+      end
     end
   end
 end

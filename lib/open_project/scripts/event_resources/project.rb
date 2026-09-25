@@ -53,9 +53,12 @@ module OpenProject::Scripts::EventResources
       def handle_notification(payload, event_name)
         action = event_name.split("_").last
         event_name = prefixed_event_name(action)
+        project = payload[:project]
 
-        active_scripts.with_event_name(event_name).pluck(:id).each do |id|
-          Scripts::ProjectScriptJob.perform_later(id, payload[:project], event_name)
+        active_scripts.with_event_name(event_name).find_each do |script|
+          dispatch_script(script, project, event_name,
+                          context: { project: },
+                          job_class: Scripts::ProjectScriptJob)
         end
       end
     end

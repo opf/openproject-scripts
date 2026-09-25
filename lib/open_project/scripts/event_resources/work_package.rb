@@ -55,7 +55,12 @@ module OpenProject::Scripts::EventResources
         event_name = prefixed_event_name(action)
         work_package = journal.journable
         actor = User.find_by(id: journal.user_id)
-        active_scripts.with_event_name(event_name).pluck(:id).each do |id|
+        # Only delayed_async WP scripts are dispatched from the aggregated-journal
+        # notification. Immediate WP scripts fire from the WorkPackages service
+        # callbacks (installed in OpenProject::Scripts::ServiceCallbacks), so they
+        # run inside the request thread rather than waiting on the async
+        # Journals::CompletedJob.
+        active_scripts.where(execution_mode: "delayed_async").with_event_name(event_name).pluck(:id).each do |id|
           Scripts::WorkPackageScriptJob.perform_later(id, work_package, event_name, actor:)
         end
       end

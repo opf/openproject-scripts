@@ -10,9 +10,12 @@ module Scripts
                                inverse_of: :script
     has_many :projects, through: :script_projects
 
+    EXECUTION_MODES = %w[delayed_async immediate].freeze
+
     validates :name, presence: true, uniqueness: { case_sensitive: false }
     validates :text, presence: true
     validates :run_as, inclusion: { in: %w[current_user system_user] }
+    validates :execution_mode, inclusion: { in: EXECUTION_MODES }
 
     def self.enabled
       where(enabled: true)
@@ -25,7 +28,7 @@ module Scripts
     end
 
     def self.new_default
-      new all_projects: true, enabled: false, run_as: "current_user"
+      new all_projects: true, enabled: false, run_as: "current_user", execution_mode: "delayed_async"
     end
 
     def all_projects?
@@ -38,6 +41,14 @@ module Scripts
 
     def enabled?
       !!enabled
+    end
+
+    def immediate?
+      execution_mode == "immediate"
+    end
+
+    def delayed_async?
+      execution_mode == "delayed_async"
     end
 
     def event_names

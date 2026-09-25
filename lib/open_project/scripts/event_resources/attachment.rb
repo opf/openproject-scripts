@@ -52,9 +52,12 @@ module OpenProject::Scripts::EventResources
       def handle_notification(payload, event_name)
         action = event_name.split("_").last
         event_name = prefixed_event_name(action)
+        attachment = payload[:attachment]
 
-        active_scripts.with_event_name(event_name).pluck(:id).each do |id|
-          Scripts::AttachmentScriptJob.perform_later(id, payload[:attachment], event_name)
+        active_scripts.with_event_name(event_name).find_each do |script|
+          dispatch_script(script, attachment, event_name,
+                          context: { attachment: },
+                          job_class: Scripts::AttachmentScriptJob)
         end
       end
     end

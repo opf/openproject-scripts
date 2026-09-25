@@ -6,6 +6,7 @@ en:
         description: 'Description'
         enabled: 'Enabled'
         events: 'Events'
+        execution_mode: 'Execution mode'
         name: 'Name'
         project_ids: 'Enabled projects'
         projects: 'Enabled projects'
@@ -36,6 +37,24 @@ en:
           When checked, the script will run on the selected events. Uncheck to disable the script.
       events:
         title: 'Enabled events'
+      execution_mode:
+        title: 'Execution mode'
+        delayed_async:
+          label: 'Delayed asynchronous execution'
+          description: >
+            The script runs in the background after the user's request has returned. Bad or slow
+            scripts do not block the request, but their effects are not immediately visible in
+            the response -- users see them only on the next page load. Recommended for
+            notifications, external calls, and anything non-critical.
+        immediate:
+          label: 'Immediate execution'
+          description: >
+            The script runs synchronously inside the same request, right after the domain object
+            is saved. Effects are visible immediately in the response the user sees. Bad or slow
+            scripts can slow down or (at the timeout limit) briefly block the user's edit.
+            Recommended for scripts that must complete before the user sees the result.
+            Note: only fires for changes going through OpenProject's service layer -- direct
+            record saves from console, migrations, and imports do not trigger scripts.
       introduction: >
         This script will run as Ruby code whenever one of the selected events occurs. Use with caution: scripts run
         with full application privileges.

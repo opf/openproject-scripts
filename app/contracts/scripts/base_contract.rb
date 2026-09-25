@@ -43,6 +43,7 @@ module Scripts
     end
     attribute :enabled
     attribute :run_as
+    attribute :execution_mode
     attribute :all_projects
     attribute :project_ids
     attribute :events

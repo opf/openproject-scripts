@@ -1,4 +1,4 @@
-# OpenProject Scripts (Experimental)
+# OpenProject plugin: Scripts (Experimental)
 
 > ⚠️ **Experimental code — do not install on any critical or production infrastructure.**
 > This plugin lets an admin execute arbitrary Ruby with full application privileges. It has not

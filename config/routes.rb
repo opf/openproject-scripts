@@ -34,7 +34,8 @@ Rails.application.routes.draw do
       resources :scripts,
                 param: :script_id,
                 controller: "scripts/admin",
-                as: "admin_scripts"
+                as: "admin_scripts",
+                except: :show
     end
   end
 end
