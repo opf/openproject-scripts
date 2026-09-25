@@ -27,7 +27,7 @@ live domain object(s) involved (the work package, project, journal, etc.).
 On work package creation or updates the script can either run asynchronously in the background, not intercepting the user's request.
 Or it can intercept the user's request to exexute right after a work package was created or updated.
 
-This plugin requires an Enterprise token as this is clearly an enterprise feature, if ever developed
+This plugin requires an Enterprise token as this — if ever implemented for produciton — is clearly an enterprise feature, if ever developed
 for production.
 
 This is deliberately modeled on OpenProject's built-in Webhooks feature — same event catalog,

@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.email       = "info@openproject.com"
   s.homepage    = "https://community.openproject.org/projects/scripts"
   s.summary     = "OpenProject Scripts"
-  s.description = "Provides an admin feature to run custom Ruby code in response to domain events."
+  s.description = "Experiment: Not for production! Provides an admin feature to run custom Ruby code in response to domain events."
   s.license     = "GPLv3"
 
   s.files = Dir["{app,config,db,lib}/**/*"] + %w(CHANGELOG.md README.md)
